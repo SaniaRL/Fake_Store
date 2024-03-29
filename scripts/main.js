@@ -206,16 +206,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document
-    .getElementById("purchase-button")
-    .addEventListener("click", function (event) {
-      // Event listener for saving product ID to localStorage and redirecting
-      const productId = localStorage.getItem("selectedProductId");
-      console.log(
-        "Product ID saved to localStorage and redirecting: " + productId
-      );
-      window.location.href = "purchaseformBS.html";
-    });
+  document.getElementById("purchase-button").addEventListener("click", function (event) {
+    const productId = localStorage.getItem("selectedProductId");
+    if (productId) {
+        let cartItems = localStorage.getItem("cartItems");
+        if (!cartItems) {
+            cartItems = [];
+        } else {
+            cartItems = JSON.parse(cartItems);
+        }
+        cartItems.push(productId);
+        localStorage.setItem("cartItems", JSON.stringify(cartItems));
+        console.log("Product ID saved to cart: " + productId);
+    } else {
+        console.log("No product ID selected.");
+    }
+});
 
   document.getElementById("navbarLinks").addEventListener("click", (e) => {
     const toggle = document.getElementById("navbar-secondary");
@@ -376,3 +382,4 @@ function resetErrors() {
   document.getElementById("zipError").innerHTML = "&nbsp;";
   document.getElementById("cityError").innerHTML = "&nbsp;";
 }
+
