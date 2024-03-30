@@ -1,6 +1,21 @@
 const productsDOM = document.querySelector(".products-layout");
 let category = "product";
 
+let cartIcon = document.querySelector(".cart-icon-btn");
+let body = document.querySelector("body");
+let closebtn = document.querySelector(".close-button");
+
+cartIcon.addEventListener("click", () => {
+  console.log("Show cart");
+  body.classList.toggle("show-cart");
+});
+
+closebtn.addEventListener("click", () => {
+  console.log("close cart");
+  body.classList.remove("show-cart");
+});
+
+
 class Products {
   async getProducts(category) {
     try {
@@ -223,6 +238,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+function updateCartItemCount(count) {
+  const cartItemCountElements = document.querySelectorAll('.numberOfItems p');
+  cartItemCountElements.forEach(element => {
+      element.textContent = count;
+  });
+}
+
   document.getElementById("navbarLinks").addEventListener("click", (e) => {
     const toggle = document.getElementById("navbar-secondary");
     const collapse = new bootstrap.Collapse(toggle, {
@@ -382,4 +404,5 @@ function resetErrors() {
   document.getElementById("zipError").innerHTML = "&nbsp;";
   document.getElementById("cityError").innerHTML = "&nbsp;";
 }
+
 
