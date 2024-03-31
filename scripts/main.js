@@ -1,19 +1,58 @@
 const productsDOM = document.querySelector(".products-layout");
 let category = "product";
 
+let modal = document.querySelector(".custom-modal");
 let cartIcon = document.querySelector(".cart-icon-btn");
 let body = document.querySelector("body");
 let closebtn = document.querySelector(".close-button");
 
-cartIcon.addEventListener("click", () => {
-  console.log("Show cart");
+cartIcon.onclick = function() {
+  modal.style.display = "block";
   body.classList.toggle("show-cart");
-});
+}
 
 closebtn.addEventListener("click", () => {
-  console.log("close cart");
+  modal.style.display = "none";
   body.classList.remove("show-cart");
 });
+
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+    body.classList.remove("show-cart");
+  }
+}
+
+const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+const ids = cartItems.map(item => item.id);
+console.log("All IDs:", ids);
+
+document.addEventListener("DOMContentLoaded", () => {
+  const updateCartItemCount = () => {
+    const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    const itemCount = cartItems.length;
+    document.querySelectorAll('.numberOfItems p').forEach(element => {
+      element.textContent = itemCount;
+    });
+  };
+
+  updateCartItemCount();
+
+  document.getElementById("purchase-button").addEventListener("click", function (event) {
+    const productId = localStorage.getItem("selectedProductId");
+    if (productId) {
+      let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      cartItems.push({ id: productId });
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      updateCartItemCount();
+      console.log("Product ID saved to cart: " + productId);
+    } else {
+      console.log("No product ID selected.");
+    }
+  });
+});
+
+
 
 
 class Products {
