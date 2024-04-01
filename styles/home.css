@@ -271,7 +271,7 @@ body {
 .shopping-cart {
   width: 400px;
   position: fixed;
-  inset: 100px 20px 100px auto;
+  inset: 100px 0 40px auto;
   display: grid;
   grid-template-rows: 60px 1fr 40px;
   background-color: #000000;
@@ -315,16 +315,11 @@ body.show-cart .shopping-cart {
   width: 70px;
   height: 70px;
   background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
 }
 
 .cart-product-image img{
   max-width: 60px;
   max-height: 60px;
-  align-self: center;
 }
 
 .cart-product:nth-child(even) {

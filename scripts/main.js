@@ -82,9 +82,39 @@ const updateCartItemCount = () => {
   });
 };
 
-//Se till att ikonen uppdateras när sidan uppdateras
+//Se till att ikonen uppdateras när sidan uppdateras och jag lägger alla mina andra DOMContedLoaded här nu, även om andra har
+//annan kod som har så
 document.addEventListener("DOMContentLoaded", () => {
   updateCartItemCount();
+
+  // Lägg lyssnare på plus-knappar
+  document.addEventListener("click", function(event) {
+    if (event.target.classList.contains("plus")) {
+      const productId = event.target.closest(".cart-product").getAttribute("data-id");
+      console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
+      increaseQuantity(productId);
+    }
+  });
+
+  //Funkar inte:
+  // document.querySelectorAll(".plus").forEach((button) => {
+  //   console.log("plus innan"); //kommer hit
+  //   button.addEventListener("click", () => {
+  //     console.log("plus");
+  //     const productId = button.closest(".cart-product").getAttribute("data-id");
+  //     console.log("plus efter");
+  //     increaseQuantity(productId);
+  //   });
+  // });
+
+  // Lägg lyssnare på minus-knappar
+  document.addEventListener("click", function(event) {
+    if (event.target.classList.contains("minus")) {
+      const productId = event.target.closest(".cart-product").getAttribute("data-id");
+      console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
+      decreaseQuantity(productId);
+    }
+  });
 });
 
 //Se till att produkter kan målas upp
@@ -99,6 +129,8 @@ function showCartProducts() {
   products.forEach((product) => {
     const productDiv = document.createElement("div");
     productDiv.classList.add("cart-product");
+    //Lagra id för att kunna ändra kvantitet
+    productDiv.setAttribute("data-id", product.id);
     //Skapa upp image
     const imageDiv = document.createElement("div");
     imageDiv.classList.add("cart-product-image");
@@ -117,6 +149,9 @@ function showCartProducts() {
             <span class="quantity-display">${product.quantity}</span>
             <span class="plus">+</span>
         `;
+        quantityDiv.addEventListener("click", (e) => {
+          console.log(e);
+        });
     //Totalpris
     const totalPriceDiv = document.createElement("div");
     totalPriceDiv.classList.add("total-price");
@@ -134,14 +169,44 @@ function showCartProducts() {
   });
 }
 
+//Se till att kvantiteten kan ökas i varukorgen - denna måste kunna ta in ett id. Egentligen skulle denna metod kunna
+//ersätta tidigare metod. Och att selected skickas in. Men endast om produkten redan finns, så det blir ändå strul.
+const increaseQuantity = (productId) => {
+  //Hämta produkterna
+  let cart = JSON.parse(localStorage.getItem("products")) || [];
+  //Kolla om produkten finns - vilket den kanske inte gör ändå, för om du backar ner till noll uppdateras inte
+  //sidan innan du öppnar varukorgen på nytt. Däremot har produkten ev plockats bort i localstorage
+  //Detta är med flit, så att du kan öka från noll om du klickat fel.
+  const index = cart.findIndex((product) => product.id == productId);
+  if (index !== -1) {
+    cart[index].quantity++;
+    localStorage.setItem("products", JSON.stringify(cart));
+    updateCartItemCount();
+    // Uppdatera gränssnittet för att visa den nya kvantiteten
+    showCartProducts();
+  }
+  //om den int finns dvs du har minskat till noll asså jag måste kolla mer på detta sen.
+};
+
+//Minska kvantiteten av en produkt - exakt samma sak som innan. Typ copy/paste men minus istället.
+const decreaseQuantity = (productId) => {
+  let cart = JSON.parse(localStorage.getItem("products")) || [];
+  const index = cart.findIndex((product) => product.id == productId);
+  if (index !== -1) {
+    if (cart[index].quantity > 1) {
+      cart[index].quantity--;
+      localStorage.setItem("products", JSON.stringify(cart));
+      updateCartItemCount();
+      // Uppdatera gränssnittet för att visa den nya kvantiteten
+      showCartProducts();
+    }
+  }
+};
+
+
+
 //Se till att knappen ändras
 //Se till att produkter kan tas bort
-
-
-
-
-
-
 
 class Products {
   async getProducts(category) {
