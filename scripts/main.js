@@ -6,54 +6,116 @@ let cartIcon = document.querySelector(".cart-icon-btn");
 let body = document.querySelector("body");
 let closebtn = document.querySelector(".close-button");
 
-cartIcon.onclick = function() {
+cartIcon.onclick = function () {
   modal.style.display = "block";
   body.classList.toggle("show-cart");
-}
+};
 
 closebtn.addEventListener("click", () => {
   modal.style.display = "none";
   body.classList.remove("show-cart");
 });
 
-window.onclick = function(event) {
+window.onclick = function (event) {
   if (event.target == modal) {
     modal.style.display = "none";
     body.classList.remove("show-cart");
   }
-}
+};
 
-const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-const ids = cartItems.map(item => item.id);
-console.log("All IDs:", ids);
+localStorage.clear();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const updateCartItemCount = () => {
-    const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-    const itemCount = cartItems.length;
-    document.querySelectorAll('.numberOfItems p').forEach(element => {
-      element.textContent = itemCount;
-    });
-  };
-
-  updateCartItemCount();
-
-  document.getElementById("purchase-button").addEventListener("click", function (event) {
+//Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
+document
+  .getElementById("purchase-button")
+  .addEventListener("click", function (event) {
+    //Kolla vilket produktID vi har (selectedProductID finns alltid)
     const productId = localStorage.getItem("selectedProductId");
-    if (productId) {
-      let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-      cartItems.push({ id: productId });
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
-      updateCartItemCount();
-      console.log("Product ID saved to cart: " + productId);
+    //Hämta alla produkter eller skapa tom array
+    let cart = JSON.parse(localStorage.getItem("products")) || [];
+    //Kolla om produkten finns i listan
+    const index = cart.findIndex((product) => product.id == productId);
+    //Om produkten redan finns
+    if (index != -1) {
+      //Om produkten finns ska kvantiteten öka. Alltså en produkt ska nu även ha ett kvantitetsattribut.
+      cart[index].quantity = cart[index].quantity + 1;
     } else {
-      console.log("No product ID selected.");
+      //Hitta den modal som är rätt modal
+      var modal = event.target.closest(".modal");
+      //Hämta produktinfo från modal - använder textContent för text och src för bild
+      const productName = modal.querySelector(".modal-title").textContent;
+      const productImage = modal.querySelector(".rounded").src;
+      const productDescription =
+        modal.querySelector(".description").textContent;
+      const productPrice = modal.querySelector(".modal-price").textContent;
+      const ratingCount = modal.querySelector(".rating-count").textContent;
+
+      //Ny produkt sparas med id som nyckel och kvantitet 1.
+      cart.push({
+        id: productId,
+        name: productName,
+        image: productImage,
+        description: productDescription,
+        price: productPrice,
+        rating: ratingCount,
+        quantity: 1,
+      });
     }
+    //Spara ner den uppdaterade varukorgen
+    localStorage.setItem("products", JSON.stringify(cart));
   });
-});
 
+// document.addEventListener("DOMContentLoaded", async () => {
+//   const cartProducts = document.querySelector(".cart-products");
 
+//   const fetchProductById = async (productId) => {
+//     try {
+//       const response = await fetch(`https://fakestoreapi.com/products/${productId}`);
+//       if (!response.ok) {
+//         throw new Error("Could not fetch product");
+//       }
+//       const product = await response.json();
+//       return product;
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   };
 
+//   const keys = Object.keys(localStorage);
+//   const productIds = keys.filter(key => key.startsWith("product_id_")).map(key => key.split("_")[2]);
+
+//   const products = await Promise.all(productIds.map(fetchProductById));
+//   products.forEach(product => renderProduct(product));
+// });
+
+// const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+// const ids = cartItems.map(item => item.id);
+// console.log("All IDs:", ids);
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   const updateCartItemCount = () => {
+//     const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+//     const itemCount = cartItems.length;
+//     document.querySelectorAll('.numberOfItems p').forEach(element => {
+//       element.textContent = itemCount;
+//     });
+//   };
+
+//   updateCartItemCount();
+
+//   document.getElementById("purchase-button").addEventListener("click", function (event) {
+//     const productId = localStorage.getItem("selectedProductId");
+//     if (productId) {
+//       let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+//       cartItems.push({ id: productId });
+//       localStorage.setItem("cartItems", JSON.stringify(cartItems));
+//       updateCartItemCount();
+//       console.log("Product ID saved to cart: " + productId);
+//     } else {
+//       console.log("No product ID selected.");
+//     }
+//   });
+// });
 
 class Products {
   async getProducts(category) {
@@ -260,29 +322,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.getElementById("purchase-button").addEventListener("click", function (event) {
-    const productId = localStorage.getItem("selectedProductId");
-    if (productId) {
+  document
+    .getElementById("purchase-button")
+    .addEventListener("click", function (event) {
+      const productId = localStorage.getItem("selectedProductId");
+      if (productId) {
         let cartItems = localStorage.getItem("cartItems");
         if (!cartItems) {
-            cartItems = [];
+          cartItems = [];
         } else {
-            cartItems = JSON.parse(cartItems);
+          cartItems = JSON.parse(cartItems);
         }
         cartItems.push(productId);
         localStorage.setItem("cartItems", JSON.stringify(cartItems));
         console.log("Product ID saved to cart: " + productId);
-    } else {
+      } else {
         console.log("No product ID selected.");
-    }
-});
+      }
+    });
 
-function updateCartItemCount(count) {
-  const cartItemCountElements = document.querySelectorAll('.numberOfItems p');
-  cartItemCountElements.forEach(element => {
+  function updateCartItemCount(count) {
+    const cartItemCountElements = document.querySelectorAll(".numberOfItems p");
+    cartItemCountElements.forEach((element) => {
       element.textContent = count;
-  });
-}
+    });
+  }
 
   document.getElementById("navbarLinks").addEventListener("click", (e) => {
     const toggle = document.getElementById("navbar-secondary");
@@ -443,5 +507,3 @@ function resetErrors() {
   document.getElementById("zipError").innerHTML = "&nbsp;";
   document.getElementById("cityError").innerHTML = "&nbsp;";
 }
-
-
