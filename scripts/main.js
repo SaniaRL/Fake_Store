@@ -9,6 +9,7 @@ let closebtn = document.querySelector(".close-button");
 cartIcon.onclick = function () {
   modal.style.display = "block";
   body.classList.toggle("show-cart");
+  showCartProducts();
 };
 
 closebtn.addEventListener("click", () => {
@@ -23,7 +24,7 @@ window.onclick = function (event) {
   }
 };
 
-// localStorage.clear();
+//localStorage.clear();
 
 //Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
 document
@@ -45,19 +46,17 @@ document
       //Hämta produktinfo från modal - använder textContent för text och src för bild
       const productName = modal.querySelector(".modal-title").textContent;
       const productImage = modal.querySelector(".rounded").src;
-      const productDescription = modal.querySelector(".description").textContent;
       //Priset innehåller dollartecken som bör tas bort för att kunna se summa framöver
-      const productPrice = parseFloat(modal.querySelector(".modal-price").textContent.substring(1));
-      const ratingCount = modal.querySelector(".rating-count").textContent;
+      const productPrice = parseFloat(
+        modal.querySelector(".modal-price").textContent.substring(1)
+      );
 
       //Ny produkt sparas med id som nyckel och kvantitet 1.
       cart.push({
         id: productId,
         name: productName,
         image: productImage,
-        description: productDescription,
         price: productPrice,
-        rating: ratingCount,
         quantity: 1,
       });
     }
@@ -67,20 +66,20 @@ document
     updateCartItemCount();
   });
 
-  //skapa logik för att uppdatera iconens räkning av produkter
-  const updateCartItemCount = () => {
-    //Hämta alla produkter (om det finns produkter)
-    const products = JSON.parse(localStorage.getItem("products")) || [];
-    //Variabel för att räkna produkter
-    let itemCount = 0;
-    //Öka summan med kvantiteten för alla produkter
-    products.forEach(item => {
-        itemCount += item.quantity;
-    });
-    //uppdatera alla ikoner (på alla html-blad)
-    document.querySelectorAll('.numberOfItems p').forEach(element => {
-        element.textContent = itemCount;
-    });
+//skapa logik för att uppdatera iconens räkning av produkter
+const updateCartItemCount = () => {
+  //Hämta alla produkter (om det finns produkter)
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  //Variabel för att räkna produkter
+  let itemCount = 0;
+  //Öka summan med kvantiteten för alla produkter
+  products.forEach((item) => {
+    itemCount += item.quantity;
+  });
+  //uppdatera alla ikoner (på alla html-blad)
+  document.querySelectorAll(".numberOfItems p").forEach((element) => {
+    element.textContent = itemCount;
+  });
 };
 
 //Se till att ikonen uppdateras när sidan uppdateras
@@ -88,19 +87,55 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCartItemCount();
 });
 
+//Se till att produkter kan målas upp
+function showCartProducts() {
+  //Hämta alla produkter
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  //"Hämta" behållaren
+  const cart = document.querySelector(".cart-products");
+  //Rensa varukorgen så det inte blir mer och mer
+  cart.innerHTML = "";
+  //Loopa produkterna för att skapa upp alla
+  products.forEach((product) => {
+    const productDiv = document.createElement("div");
+    productDiv.classList.add("cart-product");
+    //Skapa upp image
+    const imageDiv = document.createElement("div");
+    imageDiv.classList.add("cart-product-image");
+    const productImage = document.createElement("img");
+    productImage.src = product.image;
+    imageDiv.appendChild(productImage);
+    // Skapa elementen för produktnamn, kvantitet, totalpris
+    const productNameDiv = document.createElement("div");
+    productNameDiv.classList.add("product-name");
+    productNameDiv.textContent = product.name;
+    //Skapa kvantitet
+    const quantityDiv = document.createElement("div");
+    quantityDiv.classList.add("quantity");
+    quantityDiv.innerHTML = `
+            <span class="minus">-</span>
+            <span class="quantity-display">${product.quantity}</span>
+            <span class="plus">+</span>
+        `;
+    //Totalpris
+    const totalPriceDiv = document.createElement("div");
+    totalPriceDiv.classList.add("total-price");
+    // Beräkna totalpris för produkten
+    totalPriceDiv.textContent = product.price * product.quantity;
 
+    // Lägg till skapade element till det yttre div-elementet för produkten
+    productDiv.appendChild(imageDiv);
+    productDiv.appendChild(productNameDiv);
+    productDiv.appendChild(quantityDiv);
+    productDiv.appendChild(totalPriceDiv);
 
+    // Lägg till det yttre div-elementet för produkten till varukorgens container-element
+    cart.appendChild(productDiv);
+  });
+}
 
-
-
-
-
-
-
-
-
-
-
+//Se till att knappen ändras
+//Se till att produkter kan tas bort
 
 
 
