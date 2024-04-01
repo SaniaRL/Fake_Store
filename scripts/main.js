@@ -23,7 +23,7 @@ window.onclick = function (event) {
   }
 };
 
-localStorage.clear();
+// localStorage.clear();
 
 //Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
 document
@@ -45,9 +45,9 @@ document
       //Hämta produktinfo från modal - använder textContent för text och src för bild
       const productName = modal.querySelector(".modal-title").textContent;
       const productImage = modal.querySelector(".rounded").src;
-      const productDescription =
-        modal.querySelector(".description").textContent;
-      const productPrice = modal.querySelector(".modal-price").textContent;
+      const productDescription = modal.querySelector(".description").textContent;
+      //Priset innehåller dollartecken som bör tas bort för att kunna se summa framöver
+      const productPrice = parseFloat(modal.querySelector(".modal-price").textContent.substring(1));
       const ratingCount = modal.querySelector(".rating-count").textContent;
 
       //Ny produkt sparas med id som nyckel och kvantitet 1.
@@ -63,59 +63,50 @@ document
     }
     //Spara ner den uppdaterade varukorgen
     localStorage.setItem("products", JSON.stringify(cart));
+    //Uppdatera ikonen
+    updateCartItemCount();
   });
 
-// document.addEventListener("DOMContentLoaded", async () => {
-//   const cartProducts = document.querySelector(".cart-products");
+  //skapa logik för att uppdatera iconens räkning av produkter
+  const updateCartItemCount = () => {
+    //Hämta alla produkter (om det finns produkter)
+    const products = JSON.parse(localStorage.getItem("products")) || [];
+    //Variabel för att räkna produkter
+    let itemCount = 0;
+    //Öka summan med kvantiteten för alla produkter
+    products.forEach(item => {
+        itemCount += item.quantity;
+    });
+    //uppdatera alla ikoner (på alla html-blad)
+    document.querySelectorAll('.numberOfItems p').forEach(element => {
+        element.textContent = itemCount;
+    });
+};
 
-//   const fetchProductById = async (productId) => {
-//     try {
-//       const response = await fetch(`https://fakestoreapi.com/products/${productId}`);
-//       if (!response.ok) {
-//         throw new Error("Could not fetch product");
-//       }
-//       const product = await response.json();
-//       return product;
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   };
+//Se till att ikonen uppdateras när sidan uppdateras
+document.addEventListener("DOMContentLoaded", () => {
+  updateCartItemCount();
+});
 
-//   const keys = Object.keys(localStorage);
-//   const productIds = keys.filter(key => key.startsWith("product_id_")).map(key => key.split("_")[2]);
 
-//   const products = await Promise.all(productIds.map(fetchProductById));
-//   products.forEach(product => renderProduct(product));
-// });
 
-// const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-// const ids = cartItems.map(item => item.id);
-// console.log("All IDs:", ids);
 
-// document.addEventListener("DOMContentLoaded", () => {
-//   const updateCartItemCount = () => {
-//     const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-//     const itemCount = cartItems.length;
-//     document.querySelectorAll('.numberOfItems p').forEach(element => {
-//       element.textContent = itemCount;
-//     });
-//   };
 
-//   updateCartItemCount();
 
-//   document.getElementById("purchase-button").addEventListener("click", function (event) {
-//     const productId = localStorage.getItem("selectedProductId");
-//     if (productId) {
-//       let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-//       cartItems.push({ id: productId });
-//       localStorage.setItem("cartItems", JSON.stringify(cartItems));
-//       updateCartItemCount();
-//       console.log("Product ID saved to cart: " + productId);
-//     } else {
-//       console.log("No product ID selected.");
-//     }
-//   });
-// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Products {
   async getProducts(category) {
