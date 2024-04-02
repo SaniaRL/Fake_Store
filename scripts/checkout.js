@@ -16,6 +16,7 @@ function showCartProducts() {
     const products = JSON.parse(localStorage.getItem("products")) || [];
     const cart = document.querySelector(".cart-prod");
     cart.innerHTML = "";
+    let totalSumCount = 0;
     products.forEach((product) => {
       const productDiv = document.createElement("div");
       productDiv.classList.add("cart-product");
@@ -40,7 +41,9 @@ function showCartProducts() {
           });
       const totalPriceDiv = document.createElement("div");
       totalPriceDiv.classList.add("total-price");
-      totalPriceDiv.textContent = product.price * product.quantity;
+      const totalProductPrice = product.price * product.quantity;
+      totalPriceDiv.textContent = "$" + totalProductPrice.toFixed(2);
+      totalSumCount = totalSumCount + totalProductPrice;
   
       productDiv.appendChild(imageDiv);
       productDiv.appendChild(productNameDiv);
@@ -49,7 +52,11 @@ function showCartProducts() {
   
       cart.appendChild(productDiv);
     });
+    const totalSum = document.querySelector(".total-sum");
+    totalSum.textContent = "$" + totalSumCount.toFixed(2);
+  
   }
+
 
   document.addEventListener("DOMContentLoaded", () => {
   
