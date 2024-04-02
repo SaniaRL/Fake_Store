@@ -24,6 +24,10 @@ window.onclick = function (event) {
   }
 };
 
+document.querySelector(".check-out-button").addEventListener("click", function() {
+  window.location.href = "purchaseformBS.html";
+});
+
 //localStorage.clear();
 
 //Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
