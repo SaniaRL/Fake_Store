@@ -1,6 +1,217 @@
 const productsDOM = document.querySelector(".products-layout");
 let category = "product";
 
+let modal = document.querySelector(".custom-modal");
+let cartIcon = document.querySelector(".cart-icon-btn");
+let body = document.querySelector("body");
+let closebtn = document.querySelector(".close-button");
+
+cartIcon.onclick = function () {
+  modal.style.display = "block";
+  body.classList.toggle("show-cart");
+  showCartProducts();
+};
+
+closebtn.addEventListener("click", () => {
+  modal.style.display = "none";
+  body.classList.remove("show-cart");
+});
+
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+    body.classList.remove("show-cart");
+  }
+};
+
+document.querySelector(".check-out-button").addEventListener("click", function() {
+  window.location.href = "purchaseformBS.html";
+});
+
+//localStorage.clear();
+
+//Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
+document
+  .getElementById("purchase-button")
+  .addEventListener("click", function (event) {
+    //Kolla vilket produktID vi har (selectedProductID finns alltid)
+    const productId = localStorage.getItem("selectedProductId");
+    //Hämta alla produkter eller skapa tom array
+    let cart = JSON.parse(localStorage.getItem("products")) || [];
+    //Kolla om produkten finns i listan
+    const index = cart.findIndex((product) => product.id == productId);
+    //Om produkten redan finns
+    if (index != -1) {
+      //Om produkten finns ska kvantiteten öka. Alltså en produkt ska nu även ha ett kvantitetsattribut.
+      cart[index].quantity = cart[index].quantity + 1;
+    } else {
+      //Hitta den modal som är rätt modal
+      var modal = event.target.closest(".modal");
+      //Hämta produktinfo från modal - använder textContent för text och src för bild
+      const productName = modal.querySelector(".modal-title").textContent;
+      const productImage = modal.querySelector(".rounded").src;
+      //Priset innehåller dollartecken som bör tas bort för att kunna se summa framöver
+      const productPrice = parseFloat(
+        modal.querySelector(".modal-price").textContent.substring(1)
+      );
+
+      //Ny produkt sparas med id som nyckel och kvantitet 1.
+      cart.push({
+        id: productId,
+        name: productName,
+        image: productImage,
+        price: productPrice,
+        quantity: 1,
+      });
+    }
+    //Spara ner den uppdaterade varukorgen
+    localStorage.setItem("products", JSON.stringify(cart));
+    //Uppdatera ikonen
+    updateCartItemCount();
+  });
+
+//skapa logik för att uppdatera iconens räkning av produkter
+const updateCartItemCount = () => {
+  //Hämta alla produkter (om det finns produkter)
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  //Variabel för att räkna produkter
+  let itemCount = 0;
+  //Öka summan med kvantiteten för alla produkter
+  products.forEach((item) => {
+    itemCount += item.quantity;
+  });
+  //uppdatera alla ikoner (på alla html-blad)
+  document.querySelectorAll(".numberOfItems p").forEach((element) => {
+    element.textContent = itemCount;
+  });
+};
+
+//Se till att ikonen uppdateras när sidan uppdateras och jag lägger alla mina andra DOMContedLoaded här nu, även om andra har
+//annan kod som har så
+document.addEventListener("DOMContentLoaded", () => {
+  updateCartItemCount();
+
+  // Lägg lyssnare på plus-knappar
+  document.addEventListener("click", function(event) {
+    if (event.target.classList.contains("plus")) {
+      const productId = event.target.closest(".cart-product").getAttribute("data-id");
+      console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
+      increaseQuantity(productId);
+    }
+  });
+
+  //Funkar inte:
+  // document.querySelectorAll(".plus").forEach((button) => {
+  //   console.log("plus innan"); //kommer hit
+  //   button.addEventListener("click", () => {
+  //     console.log("plus");
+  //     const productId = button.closest(".cart-product").getAttribute("data-id");
+  //     console.log("plus efter");
+  //     increaseQuantity(productId);
+  //   });
+  // });
+
+  // Lägg lyssnare på minus-knappar
+  document.addEventListener("click", function(event) {
+    if (event.target.classList.contains("minus")) {
+      const productId = event.target.closest(".cart-product").getAttribute("data-id");
+      console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
+      decreaseQuantity(productId);
+    }
+  });
+});
+
+//Se till att produkter kan målas upp
+function showCartProducts() {
+  //Hämta alla produkter
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  //"Hämta" behållaren
+  const cart = document.querySelector(".cart-products");
+  //Rensa varukorgen så det inte blir mer och mer
+  cart.innerHTML = "";
+  //Loopa produkterna för att skapa upp alla
+  products.forEach((product) => {
+    const productDiv = document.createElement("div");
+    productDiv.classList.add("cart-product");
+    //Lagra id för att kunna ändra kvantitet
+    productDiv.setAttribute("data-id", product.id);
+    //Skapa upp image
+    const imageDiv = document.createElement("div");
+    imageDiv.classList.add("cart-product-image");
+    const productImage = document.createElement("img");
+    productImage.src = product.image;
+    imageDiv.appendChild(productImage);
+    // Skapa elementen för produktnamn, kvantitet, totalpris
+    const productNameDiv = document.createElement("div");
+    productNameDiv.classList.add("product-name");
+    productNameDiv.textContent = product.name;
+    //Skapa kvantitet
+    const quantityDiv = document.createElement("div");
+    quantityDiv.classList.add("quantity");
+    quantityDiv.innerHTML = `
+            <span class="minus">-</span>
+            <span class="quantity-display">${product.quantity}</span>
+            <span class="plus">+</span>
+        `;
+        quantityDiv.addEventListener("click", (e) => {
+          console.log(e);
+        });
+    //Totalpris
+    const totalPriceDiv = document.createElement("div");
+    totalPriceDiv.classList.add("total-price");
+    // Beräkna totalpris för produkten
+    totalPriceDiv.textContent = product.price * product.quantity;
+
+    // Lägg till skapade element till det yttre div-elementet för produkten
+    productDiv.appendChild(imageDiv);
+    productDiv.appendChild(productNameDiv);
+    productDiv.appendChild(quantityDiv);
+    productDiv.appendChild(totalPriceDiv);
+
+    // Lägg till det yttre div-elementet för produkten till varukorgens container-element
+    cart.appendChild(productDiv);
+  });
+}
+
+//Se till att kvantiteten kan ökas i varukorgen - denna måste kunna ta in ett id. Egentligen skulle denna metod kunna
+//ersätta tidigare metod. Och att selected skickas in. Men endast om produkten redan finns, så det blir ändå strul.
+const increaseQuantity = (productId) => {
+  //Hämta produkterna
+  let cart = JSON.parse(localStorage.getItem("products")) || [];
+  //Kolla om produkten finns - vilket den kanske inte gör ändå, för om du backar ner till noll uppdateras inte
+  //sidan innan du öppnar varukorgen på nytt. Däremot har produkten ev plockats bort i localstorage
+  //Detta är med flit, så att du kan öka från noll om du klickat fel.
+  const index = cart.findIndex((product) => product.id == productId);
+  if (index !== -1) {
+    cart[index].quantity++;
+    localStorage.setItem("products", JSON.stringify(cart));
+    updateCartItemCount();
+    // Uppdatera gränssnittet för att visa den nya kvantiteten
+    showCartProducts();
+  }
+  //om den int finns dvs du har minskat till noll asså jag måste kolla mer på detta sen.
+};
+
+//Minska kvantiteten av en produkt - exakt samma sak som innan. Typ copy/paste men minus istället.
+const decreaseQuantity = (productId) => {
+  let cart = JSON.parse(localStorage.getItem("products")) || [];
+  const index = cart.findIndex((product) => product.id == productId);
+  if (index !== -1) {
+    if (cart[index].quantity > 1) {
+      cart[index].quantity--;
+      localStorage.setItem("products", JSON.stringify(cart));
+      updateCartItemCount();
+      // Uppdatera gränssnittet för att visa den nya kvantiteten
+      showCartProducts();
+    }
+  }
+};
+
+
+
+//Se till att knappen ändras
+//Se till att produkter kan tas bort
+
 class Products {
   async getProducts(category) {
     try {
@@ -209,13 +420,28 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("purchase-button")
     .addEventListener("click", function (event) {
-      // Event listener for saving product ID to localStorage and redirecting
       const productId = localStorage.getItem("selectedProductId");
-      console.log(
-        "Product ID saved to localStorage and redirecting: " + productId
-      );
-      window.location.href = "purchaseformBS.html";
+      if (productId) {
+        let cartItems = localStorage.getItem("cartItems");
+        if (!cartItems) {
+          cartItems = [];
+        } else {
+          cartItems = JSON.parse(cartItems);
+        }
+        cartItems.push(productId);
+        localStorage.setItem("cartItems", JSON.stringify(cartItems));
+        console.log("Product ID saved to cart: " + productId);
+      } else {
+        console.log("No product ID selected.");
+      }
     });
+
+  function updateCartItemCount(count) {
+    const cartItemCountElements = document.querySelectorAll(".numberOfItems p");
+    cartItemCountElements.forEach((element) => {
+      element.textContent = count;
+    });
+  }
 
   document.getElementById("navbarLinks").addEventListener("click", (e) => {
     const toggle = document.getElementById("navbar-secondary");
