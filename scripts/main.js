@@ -207,8 +207,6 @@ const decreaseQuantity = (productId) => {
   }
 };
 
-
-
 //Se till att knappen ändras
 //Se till att produkter kan tas bort
 
