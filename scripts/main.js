@@ -70,6 +70,15 @@ document
     updateCartItemCount();
   });
 
+  //Lyssnare för check-out. Href uppdaterar inte show-cart
+  document.querySelector(".check-out-button").addEventListener("click", function() {
+    // Navigera till kassasidan
+    window.location.href = "purchaseformBS.html";
+    
+    // Visa produkter i varukorgen när du navigerar till kassan
+    showCartProducts();
+  });
+
 //skapa logik för att uppdatera iconens räkning av produkter
 const updateCartItemCount = () => {
   //Hämta alla produkter (om det finns produkter)
@@ -207,7 +216,9 @@ const decreaseQuantity = (productId) => {
   }
 };
 
+//Se till att produkter målas upp på kassasidan
 
+//Se till att produkter målas upp på bekräftelsesidan
 
 //Se till att knappen ändras
 //Se till att produkter kan tas bort
@@ -436,13 +447,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-  function updateCartItemCount(count) {
-    const cartItemCountElements = document.querySelectorAll(".numberOfItems p");
-    cartItemCountElements.forEach((element) => {
-      element.textContent = count;
-    });
-  }
-
   document.getElementById("navbarLinks").addEventListener("click", (e) => {
     const toggle = document.getElementById("navbar-secondary");
     const collapse = new bootstrap.Collapse(toggle, {
@@ -506,99 +510,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function displayProductDetails(product) {
   // Get the elements by ID
-  const productImgElement = document.getElementById("product-img-pf");
-  const productNameElement = document.getElementById("product-name-pf");
-  const productDescElement = document.getElementById("product-desc-pf");
-  const productPriceElement = document.getElementById("product-price-pf");
+  // const productImgElement = document.getElementById("product-img-pf");
+  // const productNameElement = document.getElementById("product-name-pf");
+  // const productDescElement = document.getElementById("product-desc-pf");
+  // const productPriceElement = document.getElementById("product-price-pf");
 
   // Update the elements with the product details
-  productImgElement.src = product.image;
-  productNameElement.textContent = product.title;
-  productDescElement.textContent = product.description;
-  productPriceElement.textContent = "Price: $" + product.price;
+  // productImgElement.src = product.image;
+  // productNameElement.textContent = product.title;
+  // productDescElement.textContent = product.description;
+  // productPriceElement.textContent = "Price: $" + product.price;
 }
 
-document.getElementById("form").addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  let firstName = document.getElementById("fname").value;
-  let lastName = document.getElementById("lname").value;
-  let email = document.getElementById("email").value;
-  let phone = document.getElementById("phone").value;
-  let address = document.getElementById("address").value;
-  let zip = document.getElementById("zip").value;
-  let city = document.getElementById("city").value;
-
-  resetErrors();
-
-  let isValid = true;
-  if (!validInputSize(firstName)) {
-    document.getElementById("fnameError").innerText =
-      "Input must be between 2 and 50 characters long.";
-    isValid = false;
-  }
-  if (!validInputSize(lastName)) {
-    document.getElementById("lnameError").innerText =
-      "Input must be between 2 and 50 characters long.";
-    isValid = false;
-  }
-  if (!validEmail(email)) {
-    document.getElementById("emailError").innerText =
-      "Please enter a valid email.";
-    isValid = false;
-  }
-  if (!validPhoneNumber(phone)) {
-    document.getElementById("phoneError").innerText =
-      "Please enter a valid phone number.";
-    isValid = false;
-  }
-  if (!validInputSize(address)) {
-    document.getElementById("addressError").innerText =
-      "Input must be between 2 and 50 characters long.";
-    isValid = false;
-  }
-  if (!validZip(zip)) {
-    document.getElementById("zipError").innerText =
-      "Please enter a valid ZIP code.";
-    isValid = false;
-  }
-  if (!validInputSize(city)) {
-    document.getElementById("cityError").innerText =
-      "Input must be between 2 and 50 characters long.";
-    isValid = false;
-  }
-  if (isValid) {
-    localStorage.setItem("first-name", firstName);
-    localStorage.setItem("last-name", lastName);
-    localStorage.setItem("email", email);
-    localStorage.setItem("phone", phone);
-    localStorage.setItem("address", address);
-    localStorage.setItem("zip", zip);
-    localStorage.setItem("city", city);
-
-    window.location.href = "confirmation.html";
-  }
-});
-
-function validInputSize(input) {
-  return /^.{2,50}$/.test(input);
-}
-function validEmail(input) {
-  return /^(?=.{1,50}$)[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
-}
-function validZip(input) {
-  return /^\d{3}\s*\d{2}$/.test(input);
-}
-function validPhoneNumber(input) {
-  return /^07[0236]-?\d{7}$/.test(input);
-}
-
-function resetErrors() {
-  document.getElementById("fnameError").innerHTML = "&nbsp;";
-  document.getElementById("lnameError").innerHTML = "&nbsp;";
-  document.getElementById("emailError").innerHTML = "&nbsp;";
-  document.getElementById("phoneError").innerHTML = "&nbsp;";
-  document.getElementById("addressError").innerHTML = "&nbsp;";
-  document.getElementById("zipError").innerHTML = "&nbsp;";
-  document.getElementById("cityError").innerHTML = "&nbsp;";
-}

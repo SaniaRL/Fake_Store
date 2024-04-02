@@ -268,6 +268,40 @@ body {
     background-color: rgba(0,0,0,0.4);
 }
 
+.pf-cart {
+  display: grid;
+  grid-template-rows: 60px 1fr 40px;
+  background-color: #000000;
+  color: #ebdbb2;
+  text-align: center;
+}
+
+.cart-prod {
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.cart-prod::-webkit-scrollbar {
+  width: 10px;
+}
+
+.cart-prod::-webkit-scrollbar-track {
+  background: #ebdbb2;
+}
+
+.cart-prod::-webkit-scrollbar-thumb {
+  background: #000000;
+}
+
+.cart-prod::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.total-sum {
+  font-size: 44;
+}
+
 .shopping-cart {
   width: 400px;
   position: fixed;
