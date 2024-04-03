@@ -139,6 +139,9 @@ document.addEventListener("DOMContentLoaded", () => {
     showCartProducts();
     //Uppdatera ikonen som visar antal produkter
     updateCartItemCount();
+    //Ta bort totalsumman också, den är ju ful
+    const ts = document.querySelector(".total-sum");
+    ts.textContent = "";
   });
 
 });
@@ -151,6 +154,8 @@ function showCartProducts() {
   const cart = document.querySelector(".cart-products");
   //Rensa varukorgen så det inte blir mer och mer
   cart.innerHTML = "";
+  //Variabel för totalsumma
+  let totalSumCount = 0;
   //Loopa produkterna för att skapa upp alla
   products.forEach((product) => {
     const productDiv = document.createElement("div");
@@ -179,7 +184,12 @@ function showCartProducts() {
     const totalPriceDiv = document.createElement("div");
     totalPriceDiv.classList.add("total-price");
     // Beräkna totalpris för produkten
-    totalPriceDiv.textContent = product.price * product.quantity;
+    const totalPrice = product.price * product.quantity;
+    totalPriceDiv.textContent = totalPrice.toFixed(2);
+    //Uppdatera totalsumman
+    totalSumCount = totalSumCount + totalPrice;
+    const totalSum = document.querySelector(".total-sum");
+    totalSum.textContent = "Total Price: $" + totalSumCount.toFixed(2);
 
     // Lägg till skapade element till det yttre div-elementet för produkten
     productDiv.appendChild(imageDiv);

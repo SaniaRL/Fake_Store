@@ -312,7 +312,7 @@ body {
   position: fixed;
   inset: 100px 0 40px auto;
   display: grid;
-  grid-template-rows: 60px 1fr 40px;
+  grid-template-rows: 60px 1fr 30px 40px;
   background-color: #000000;
   color: #ebdbb2;
   text-align: center;
