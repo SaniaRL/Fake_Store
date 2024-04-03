@@ -73,11 +73,13 @@ document
     updateCartItemCount();
   });
 
-  //Lyssnare för check-out. Href uppdaterar inte show-cart
-  document.querySelector(".check-out-button").addEventListener("click", function() {
+//Lyssnare för check-out. Href uppdaterar inte show-cart
+document
+  .querySelector(".check-out-button")
+  .addEventListener("click", function () {
     // Navigera till kassasidan
     window.location.href = "purchaseformBS.html";
-    
+
     // Visa produkter i varukorgen när du navigerar till kassan
     showCartProducts();
   });
@@ -104,9 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCartItemCount();
 
   // Lägg lyssnare på plus-knappar
-  document.addEventListener("click", function(event) {
+  document.addEventListener("click", function (event) {
     if (event.target.classList.contains("plus")) {
-      const productId = event.target.closest(".cart-product").getAttribute("data-id");
+      const productId = event.target
+        .closest(".cart-product")
+        .getAttribute("data-id");
       console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
       increaseQuantity(productId);
     }
@@ -124,16 +128,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // });
 
   // Lägg lyssnare på minus-knappar
-  document.addEventListener("click", function(event) {
+  document.addEventListener("click", function (event) {
     if (event.target.classList.contains("minus")) {
-      const productId = event.target.closest(".cart-product").getAttribute("data-id");
+      const productId = event.target
+        .closest(".cart-product")
+        .getAttribute("data-id");
       console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
       decreaseQuantity(productId);
     }
   });
 
   const clearCartButton = document.querySelector(".clear-cart-button");
-  clearCartButton.addEventListener("click", function() {
+  clearCartButton.addEventListener("click", function () {
     localStorage.clear();
     //Uppdatera varukorgen så den blir tom
     showCartProducts();
@@ -143,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const ts = document.querySelector(".total-sum");
     ts.textContent = "";
   });
-
 });
 
 //Se till att produkter kan målas upp
@@ -186,6 +191,17 @@ function showCartProducts() {
     // Beräkna totalpris för produkten
     const totalPrice = product.price * product.quantity;
     totalPriceDiv.textContent = totalPrice.toFixed(2);
+    //HÄR VILL JAG HA DELETE
+
+    const removeDiv = document.createElement("div");
+    removeDiv.classList.add(".remove");
+    //Inner-HTML är chill men vet inte om det funkar lika bra
+    removeDiv.innerHTML = `
+     <i>
+       <img src="images/delete.png">
+     </i>
+        `;
+        console.log(removeDiv);
     //Uppdatera totalsumman
     totalSumCount = totalSumCount + totalPrice;
     const totalSum = document.querySelector(".total-sum");
@@ -196,6 +212,7 @@ function showCartProducts() {
     productDiv.appendChild(productNameDiv);
     productDiv.appendChild(quantityDiv);
     productDiv.appendChild(totalPriceDiv);
+    productDiv.appendChild(removeDiv);
 
     // Lägg till det yttre div-elementet för produkten till varukorgens container-element
     cart.appendChild(productDiv);
@@ -239,7 +256,7 @@ const decreaseQuantity = (productId) => {
 //Ta bort en produkt helt
 const removeProduct = (productId) => {
   let cart = JSON.parse(localStorage.getItem("products")) || [];
-  cart = cart.filter(product => product.id !== productId);
+  cart = cart.filter((product) => product.id !== productId);
   localStorage.setItem("products", JSON.stringify(cart));
 };
 
@@ -541,11 +558,9 @@ function displayProductDetails(product) {
   // const productNameElement = document.getElementById("product-name-pf");
   // const productDescElement = document.getElementById("product-desc-pf");
   // const productPriceElement = document.getElementById("product-price-pf");
-
   // Update the elements with the product details
   // productImgElement.src = product.image;
   // productNameElement.textContent = product.title;
   // productDescElement.textContent = product.description;
   // productPriceElement.textContent = "Price: $" + product.price;
 }
-
