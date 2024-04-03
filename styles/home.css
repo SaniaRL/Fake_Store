@@ -298,6 +298,11 @@ body {
   background: #555;
 }
 
+.remove-product {
+  width: 40px;
+  background-color: #309821;
+}
+
 .total-sum {
   font-size: 44;
 }
@@ -324,7 +329,7 @@ body.show-cart .shopping-cart {
 
 .shopping-cart-button {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .check-out-button {

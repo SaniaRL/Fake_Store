@@ -24,11 +24,14 @@ window.onclick = function (event) {
   }
 };
 
-document.querySelector(".check-out-button").addEventListener("click", function() {
+document.querySelector(".check-out-button").addEventListener("click", () => {
   window.location.href = "purchaseformBS.html";
 });
 
-//localStorage.clear();
+// document.querySelector(".clear-cart-button").addEventListener("click", () => {
+//   console.log("clear cart");
+//   localStorage.clear();
+// });
 
 //Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
 document
@@ -128,6 +131,16 @@ document.addEventListener("DOMContentLoaded", () => {
       decreaseQuantity(productId);
     }
   });
+
+  const clearCartButton = document.querySelector(".clear-cart-button");
+  clearCartButton.addEventListener("click", function() {
+    localStorage.clear();
+    //Uppdatera varukorgen så den blir tom
+    showCartProducts();
+    //Uppdatera ikonen som visar antal produkter
+    updateCartItemCount();
+  });
+
 });
 
 //Se till att produkter kan målas upp
@@ -162,9 +175,6 @@ function showCartProducts() {
             <span class="quantity-display">${product.quantity}</span>
             <span class="plus">+</span>
         `;
-        quantityDiv.addEventListener("click", (e) => {
-          console.log(e);
-        });
     //Totalpris
     const totalPriceDiv = document.createElement("div");
     totalPriceDiv.classList.add("total-price");
@@ -214,6 +224,13 @@ const decreaseQuantity = (productId) => {
       showCartProducts();
     }
   }
+};
+
+//Ta bort en produkt helt
+const removeProduct = (productId) => {
+  let cart = JSON.parse(localStorage.getItem("products")) || [];
+  cart = cart.filter(product => product.id !== productId);
+  localStorage.setItem("products", JSON.stringify(cart));
 };
 
 //Se till att produkter målas upp på kassasidan
