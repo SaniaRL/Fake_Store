@@ -24,38 +24,32 @@ window.onclick = function (event) {
   }
 };
 
-document.querySelector(".check-out-button").addEventListener("click", function() {
+document.querySelector(".check-out-button").addEventListener("click", () => {
   window.location.href = "purchaseformBS.html";
 });
 
-//localStorage.clear();
+// document.querySelector(".clear-cart-button").addEventListener("click", () => {
+//   console.log("clear cart");
+//   localStorage.clear();
+// });
 
 //Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
+
 document
   .getElementById("purchase-button")
   .addEventListener("click", function (event) {
-    //Kolla vilket produktID vi har (selectedProductID finns alltid)
     const productId = localStorage.getItem("selectedProductId");
-    //Hämta alla produkter eller skapa tom array
     let cart = JSON.parse(localStorage.getItem("products")) || [];
-    //Kolla om produkten finns i listan
     const index = cart.findIndex((product) => product.id == productId);
-    //Om produkten redan finns
     if (index != -1) {
-      //Om produkten finns ska kvantiteten öka. Alltså en produkt ska nu även ha ett kvantitetsattribut.
       cart[index].quantity = cart[index].quantity + 1;
     } else {
-      //Hitta den modal som är rätt modal
       var modal = event.target.closest(".modal");
-      //Hämta produktinfo från modal - använder textContent för text och src för bild
       const productName = modal.querySelector(".modal-title").textContent;
       const productImage = modal.querySelector(".rounded").src;
-      //Priset innehåller dollartecken som bör tas bort för att kunna se summa framöver
       const productPrice = parseFloat(
         modal.querySelector(".modal-price").textContent.substring(1)
       );
-
-      //Ny produkt sparas med id som nyckel och kvantitet 1.
       cart.push({
         id: productId,
         name: productName,
@@ -64,32 +58,24 @@ document
         quantity: 1,
       });
     }
-    //Spara ner den uppdaterade varukorgen
     localStorage.setItem("products", JSON.stringify(cart));
-    //Uppdatera ikonen
     updateCartItemCount();
   });
 
-  //Lyssnare för check-out. Href uppdaterar inte show-cart
-  document.querySelector(".check-out-button").addEventListener("click", function() {
-    // Navigera till kassasidan
+document
+  .querySelector(".check-out-button")
+  .addEventListener("click", function () {
     window.location.href = "purchaseformBS.html";
-    
-    // Visa produkter i varukorgen när du navigerar till kassan
+
     showCartProducts();
   });
 
-//skapa logik för att uppdatera iconens räkning av produkter
 const updateCartItemCount = () => {
-  //Hämta alla produkter (om det finns produkter)
   const products = JSON.parse(localStorage.getItem("products")) || [];
-  //Variabel för att räkna produkter
   let itemCount = 0;
-  //Öka summan med kvantiteten för alla produkter
   products.forEach((item) => {
     itemCount += item.quantity;
   });
-  //uppdatera alla ikoner (på alla html-blad)
   document.querySelectorAll(".numberOfItems p").forEach((element) => {
     element.textContent = itemCount;
   });
@@ -101,9 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCartItemCount();
 
   // Lägg lyssnare på plus-knappar
-  document.addEventListener("click", function(event) {
+  document.addEventListener("click", function (event) {
     if (event.target.classList.contains("plus")) {
-      const productId = event.target.closest(".cart-product").getAttribute("data-id");
+      const productId = event.target
+        .closest(".cart-product")
+        .getAttribute("data-id");
       console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
       increaseQuantity(productId);
     }
@@ -121,12 +109,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // });
 
   // Lägg lyssnare på minus-knappar
-  document.addEventListener("click", function(event) {
+  document.addEventListener("click", function (event) {
     if (event.target.classList.contains("minus")) {
-      const productId = event.target.closest(".cart-product").getAttribute("data-id");
+      const productId = event.target
+        .closest(".cart-product")
+        .getAttribute("data-id");
       console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
       decreaseQuantity(productId);
     }
+  });
+
+  const clearCartButton = document.querySelector(".clear-cart-button");
+  clearCartButton.addEventListener("click", function () {
+    localStorage.clear();
+    //Uppdatera varukorgen så den blir tom
+    showCartProducts();
+    //Uppdatera ikonen som visar antal produkter
+    updateCartItemCount();
+    //Ta bort totalsumman också, den är ju ful
+    const ts = document.querySelector(".total-sum");
+    ts.textContent = "";
   });
 });
 
@@ -138,6 +140,8 @@ function showCartProducts() {
   const cart = document.querySelector(".cart-products");
   //Rensa varukorgen så det inte blir mer och mer
   cart.innerHTML = "";
+  //Variabel för totalsumma
+  let totalSumCount = 0;
   //Loopa produkterna för att skapa upp alla
   products.forEach((product) => {
     const productDiv = document.createElement("div");
@@ -162,23 +166,52 @@ function showCartProducts() {
             <span class="quantity-display">${product.quantity}</span>
             <span class="plus">+</span>
         `;
-        quantityDiv.addEventListener("click", (e) => {
-          console.log(e);
-        });
     //Totalpris
     const totalPriceDiv = document.createElement("div");
     totalPriceDiv.classList.add("total-price");
     // Beräkna totalpris för produkten
-    totalPriceDiv.textContent = product.price * product.quantity;
+    const totalPrice = product.price * product.quantity;
+    totalPriceDiv.textContent = totalPrice.toFixed(2);
+    //HÄR VILL JAG HA DELETE - gjorde detta med innerHTML först men det strulade. Felet var dock att jag skrivit punkt innan remove.
+    const removeDiv = document.createElement("div");
+    removeDiv.classList.add("remove");
+    const removeImage = document.createElement("img");
+    removeImage.src = "images/delete.png";
+    removeDiv.appendChild(removeImage);
+
+    //Inner-HTML är chill men vet inte om det funkar lika bra
+    // removeDiv.innerHTML = `
+    //  <i>
+    //    <img src="images/delete.png">
+    //  </i>
+    //     `;
+    //     console.log(removeDiv);
+    //Uppdatera totalsumman
+    totalSumCount = totalSumCount + totalPrice;
+    const totalSum = document.querySelector(".total-sum");
+    totalSum.textContent = "Total Price: $" + totalSumCount.toFixed(2);
 
     // Lägg till skapade element till det yttre div-elementet för produkten
     productDiv.appendChild(imageDiv);
     productDiv.appendChild(productNameDiv);
     productDiv.appendChild(quantityDiv);
     productDiv.appendChild(totalPriceDiv);
+    productDiv.appendChild(removeDiv);
 
     // Lägg till det yttre div-elementet för produkten till varukorgens container-element
     cart.appendChild(productDiv);
+
+    //Ny tanke. Asså här skapas ju liksom alla upp. Kan jag inte bara lägga lyssnare här? Då vet jag att de finns redan.
+    removeDiv.addEventListener("click", function (event) {
+      const removeProductID = event.target
+        .closest(".cart-product")
+        .getAttribute("data-id");
+      removeProduct(removeProductID);
+      //Risk för rekursion - men det verkar funka ändå? why? idk, men det funkar.
+      showCartProducts();
+      //Uppdatera varukorg - gör säkert vissa saker dubbelt men denna skedde inte automatiskt och bör ropas på
+      updateCartItemCount();
+    });
   });
 }
 
@@ -214,6 +247,13 @@ const decreaseQuantity = (productId) => {
       showCartProducts();
     }
   }
+};
+
+//Ta bort en produkt helt
+const removeProduct = (productId) => {
+  let cart = JSON.parse(localStorage.getItem("products")) || [];
+  cart = cart.filter((product) => product.id !== productId);
+  localStorage.setItem("products", JSON.stringify(cart));
 };
 
 //Se till att produkter målas upp på kassasidan
@@ -514,11 +554,9 @@ function displayProductDetails(product) {
   // const productNameElement = document.getElementById("product-name-pf");
   // const productDescElement = document.getElementById("product-desc-pf");
   // const productPriceElement = document.getElementById("product-price-pf");
-
   // Update the elements with the product details
   // productImgElement.src = product.image;
   // productNameElement.textContent = product.title;
   // productDescElement.textContent = product.description;
   // productPriceElement.textContent = "Price: $" + product.price;
 }
-
