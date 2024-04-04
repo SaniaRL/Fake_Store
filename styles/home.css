@@ -1,5 +1,5 @@
 html {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 html,
@@ -8,6 +8,27 @@ body {
   padding: 0;
   height: 100%;
 }
+
+/* .products-layout {
+  overflow-y: scroll;
+}
+
+.products-layout::-webkit-scrollbar {
+  width: 10px;
+}
+
+.products-layout::-webkit-scrollbar-track {
+  background: #ebdbb2;
+}
+
+.products-layout::-webkit-scrollbar-thumb {
+  background: #000000;
+}
+
+.products-layout::-webkit-scrollbar-thumb:hover {
+  background: #555;
+} */
+
 
 .card {
   box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
@@ -351,13 +372,10 @@ body.show-cart .shopping-cart {
   border: 2px solid black;
 }
 
-.remove {
-  visibility: visible;
-}
-
 .remove img {
-  width: 10px;
-  height: 10px;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
 }
 
 .product-name {

@@ -34,31 +34,22 @@ document.querySelector(".check-out-button").addEventListener("click", () => {
 // });
 
 //Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
+
 document
   .getElementById("purchase-button")
   .addEventListener("click", function (event) {
-    //Kolla vilket produktID vi har (selectedProductID finns alltid)
     const productId = localStorage.getItem("selectedProductId");
-    //Hämta alla produkter eller skapa tom array
     let cart = JSON.parse(localStorage.getItem("products")) || [];
-    //Kolla om produkten finns i listan
     const index = cart.findIndex((product) => product.id == productId);
-    //Om produkten redan finns
     if (index != -1) {
-      //Om produkten finns ska kvantiteten öka. Alltså en produkt ska nu även ha ett kvantitetsattribut.
       cart[index].quantity = cart[index].quantity + 1;
     } else {
-      //Hitta den modal som är rätt modal
       var modal = event.target.closest(".modal");
-      //Hämta produktinfo från modal - använder textContent för text och src för bild
       const productName = modal.querySelector(".modal-title").textContent;
       const productImage = modal.querySelector(".rounded").src;
-      //Priset innehåller dollartecken som bör tas bort för att kunna se summa framöver
       const productPrice = parseFloat(
         modal.querySelector(".modal-price").textContent.substring(1)
       );
-
-      //Ny produkt sparas med id som nyckel och kvantitet 1.
       cart.push({
         id: productId,
         name: productName,
@@ -67,34 +58,24 @@ document
         quantity: 1,
       });
     }
-    //Spara ner den uppdaterade varukorgen
     localStorage.setItem("products", JSON.stringify(cart));
-    //Uppdatera ikonen
     updateCartItemCount();
   });
 
-//Lyssnare för check-out. Href uppdaterar inte show-cart
 document
   .querySelector(".check-out-button")
   .addEventListener("click", function () {
-    // Navigera till kassasidan
     window.location.href = "purchaseformBS.html";
 
-    // Visa produkter i varukorgen när du navigerar till kassan
     showCartProducts();
   });
 
-//skapa logik för att uppdatera iconens räkning av produkter
 const updateCartItemCount = () => {
-  //Hämta alla produkter (om det finns produkter)
   const products = JSON.parse(localStorage.getItem("products")) || [];
-  //Variabel för att räkna produkter
   let itemCount = 0;
-  //Öka summan med kvantiteten för alla produkter
   products.forEach((item) => {
     itemCount += item.quantity;
   });
-  //uppdatera alla ikoner (på alla html-blad)
   document.querySelectorAll(".numberOfItems p").forEach((element) => {
     element.textContent = itemCount;
   });
@@ -191,17 +172,20 @@ function showCartProducts() {
     // Beräkna totalpris för produkten
     const totalPrice = product.price * product.quantity;
     totalPriceDiv.textContent = totalPrice.toFixed(2);
-    //HÄR VILL JAG HA DELETE
-
+    //HÄR VILL JAG HA DELETE - gjorde detta med innerHTML först men det strulade. Felet var dock att jag skrivit punkt innan remove.
     const removeDiv = document.createElement("div");
-    removeDiv.classList.add(".remove");
+    removeDiv.classList.add("remove");
+    const removeImage = document.createElement("img");
+    removeImage.src = "images/delete.png";
+    removeDiv.appendChild(removeImage);
+
     //Inner-HTML är chill men vet inte om det funkar lika bra
-    removeDiv.innerHTML = `
-     <i>
-       <img src="images/delete.png">
-     </i>
-        `;
-        console.log(removeDiv);
+    // removeDiv.innerHTML = `
+    //  <i>
+    //    <img src="images/delete.png">
+    //  </i>
+    //     `;
+    //     console.log(removeDiv);
     //Uppdatera totalsumman
     totalSumCount = totalSumCount + totalPrice;
     const totalSum = document.querySelector(".total-sum");
@@ -216,6 +200,18 @@ function showCartProducts() {
 
     // Lägg till det yttre div-elementet för produkten till varukorgens container-element
     cart.appendChild(productDiv);
+
+    //Ny tanke. Asså här skapas ju liksom alla upp. Kan jag inte bara lägga lyssnare här? Då vet jag att de finns redan.
+    removeDiv.addEventListener("click", function (event) {
+      const removeProductID = event.target
+        .closest(".cart-product")
+        .getAttribute("data-id");
+      removeProduct(removeProductID);
+      //Risk för rekursion - men det verkar funka ändå? why? idk, men det funkar.
+      showCartProducts();
+      //Uppdatera varukorg - gör säkert vissa saker dubbelt men denna skedde inte automatiskt och bör ropas på
+      updateCartItemCount();
+    });
   });
 }
 
