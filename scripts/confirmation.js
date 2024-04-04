@@ -39,7 +39,7 @@ function showCartProducts() {
     const quantityDiv = document.createElement("div");
     quantityDiv.classList.add("quantity");
     quantityDiv.innerHTML = `
-            <span class="quantity-display">${product.quantity}</span>
+            <span class="quantity-display-cp">${product.quantity}</span>
         `;
     const totalPriceDiv = document.createElement("div");
     totalPriceDiv.classList.add("total-price");

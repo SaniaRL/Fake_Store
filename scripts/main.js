@@ -28,13 +28,6 @@ document.querySelector(".check-out-button").addEventListener("click", () => {
   window.location.href = "purchaseformBS.html";
 });
 
-// document.querySelector(".clear-cart-button").addEventListener("click", () => {
-//   console.log("clear cart");
-//   localStorage.clear();
-// });
-
-//Sätt en lyssnare på knappen som nu egentligen inte är purchase, men add to cart
-
 document
   .getElementById("purchase-button")
   .addEventListener("click", function (event) {
@@ -81,40 +74,25 @@ const updateCartItemCount = () => {
   });
 };
 
-//Se till att ikonen uppdateras när sidan uppdateras och jag lägger alla mina andra DOMContedLoaded här nu, även om andra har
-//annan kod som har så
 document.addEventListener("DOMContentLoaded", () => {
   updateCartItemCount();
 
-  // Lägg lyssnare på plus-knappar
   document.addEventListener("click", function (event) {
     if (event.target.classList.contains("plus")) {
       const productId = event.target
         .closest(".cart-product")
         .getAttribute("data-id");
-      console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
+      console.log("Produkt ID:", productId);
       increaseQuantity(productId);
     }
   });
 
-  //Funkar inte:
-  // document.querySelectorAll(".plus").forEach((button) => {
-  //   console.log("plus innan"); //kommer hit
-  //   button.addEventListener("click", () => {
-  //     console.log("plus");
-  //     const productId = button.closest(".cart-product").getAttribute("data-id");
-  //     console.log("plus efter");
-  //     increaseQuantity(productId);
-  //   });
-  // });
-
-  // Lägg lyssnare på minus-knappar
   document.addEventListener("click", function (event) {
     if (event.target.classList.contains("minus")) {
       const productId = event.target
         .closest(".cart-product")
         .getAttribute("data-id");
-      console.log("Produkt ID:", productId); // Kontrollera att produktens ID hämtas korrekt
+      console.log("Produkt ID:", productId);
       decreaseQuantity(productId);
     }
   });
@@ -122,43 +100,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearCartButton = document.querySelector(".clear-cart-button");
   clearCartButton.addEventListener("click", function () {
     localStorage.clear();
-    //Uppdatera varukorgen så den blir tom
     showCartProducts();
-    //Uppdatera ikonen som visar antal produkter
     updateCartItemCount();
-    //Ta bort totalsumman också, den är ju ful
     const ts = document.querySelector(".total-sum");
     ts.textContent = "";
   });
 });
 
-//Se till att produkter kan målas upp
 function showCartProducts() {
-  //Hämta alla produkter
   const products = JSON.parse(localStorage.getItem("products")) || [];
-  //"Hämta" behållaren
   const cart = document.querySelector(".cart-products");
-  //Rensa varukorgen så det inte blir mer och mer
   cart.innerHTML = "";
-  //Variabel för totalsumma
   let totalSumCount = 0;
-  //Loopa produkterna för att skapa upp alla
   products.forEach((product) => {
     const productDiv = document.createElement("div");
     productDiv.classList.add("cart-product");
-    //Lagra id för att kunna ändra kvantitet
     productDiv.setAttribute("data-id", product.id);
-    //Skapa upp image
     const imageDiv = document.createElement("div");
     imageDiv.classList.add("cart-product-image");
     const productImage = document.createElement("img");
     productImage.src = product.image;
     imageDiv.appendChild(productImage);
-    // Skapa elementen för produktnamn, kvantitet, totalpris
     const productNameDiv = document.createElement("div");
     productNameDiv.classList.add("product-name");
     productNameDiv.textContent = product.name;
-    //Skapa kvantitet
     const quantityDiv = document.createElement("div");
     quantityDiv.classList.add("quantity");
     quantityDiv.innerHTML = `
@@ -166,75 +131,49 @@ function showCartProducts() {
             <span class="quantity-display">${product.quantity}</span>
             <span class="plus">+</span>
         `;
-    //Totalpris
     const totalPriceDiv = document.createElement("div");
     totalPriceDiv.classList.add("total-price");
-    // Beräkna totalpris för produkten
     const totalPrice = product.price * product.quantity;
     totalPriceDiv.textContent = totalPrice.toFixed(2);
-    //HÄR VILL JAG HA DELETE - gjorde detta med innerHTML först men det strulade. Felet var dock att jag skrivit punkt innan remove.
     const removeDiv = document.createElement("div");
     removeDiv.classList.add("remove");
     const removeImage = document.createElement("img");
     removeImage.src = "images/delete.png";
     removeDiv.appendChild(removeImage);
-
-    //Inner-HTML är chill men vet inte om det funkar lika bra
-    // removeDiv.innerHTML = `
-    //  <i>
-    //    <img src="images/delete.png">
-    //  </i>
-    //     `;
-    //     console.log(removeDiv);
-    //Uppdatera totalsumman
     totalSumCount = totalSumCount + totalPrice;
     const totalSum = document.querySelector(".total-sum");
     totalSum.textContent = "Total Price: $" + totalSumCount.toFixed(2);
 
-    // Lägg till skapade element till det yttre div-elementet för produkten
     productDiv.appendChild(imageDiv);
     productDiv.appendChild(productNameDiv);
     productDiv.appendChild(quantityDiv);
     productDiv.appendChild(totalPriceDiv);
     productDiv.appendChild(removeDiv);
 
-    // Lägg till det yttre div-elementet för produkten till varukorgens container-element
     cart.appendChild(productDiv);
 
-    //Ny tanke. Asså här skapas ju liksom alla upp. Kan jag inte bara lägga lyssnare här? Då vet jag att de finns redan.
     removeDiv.addEventListener("click", function (event) {
       const removeProductID = event.target
         .closest(".cart-product")
         .getAttribute("data-id");
       removeProduct(removeProductID);
-      //Risk för rekursion - men det verkar funka ändå? why? idk, men det funkar.
       showCartProducts();
-      //Uppdatera varukorg - gör säkert vissa saker dubbelt men denna skedde inte automatiskt och bör ropas på
       updateCartItemCount();
     });
   });
 }
 
-//Se till att kvantiteten kan ökas i varukorgen - denna måste kunna ta in ett id. Egentligen skulle denna metod kunna
-//ersätta tidigare metod. Och att selected skickas in. Men endast om produkten redan finns, så det blir ändå strul.
 const increaseQuantity = (productId) => {
-  //Hämta produkterna
   let cart = JSON.parse(localStorage.getItem("products")) || [];
-  //Kolla om produkten finns - vilket den kanske inte gör ändå, för om du backar ner till noll uppdateras inte
-  //sidan innan du öppnar varukorgen på nytt. Däremot har produkten ev plockats bort i localstorage
-  //Detta är med flit, så att du kan öka från noll om du klickat fel.
   const index = cart.findIndex((product) => product.id == productId);
   if (index !== -1) {
     cart[index].quantity++;
     localStorage.setItem("products", JSON.stringify(cart));
     updateCartItemCount();
-    // Uppdatera gränssnittet för att visa den nya kvantiteten
     showCartProducts();
   }
-  //om den int finns dvs du har minskat till noll asså jag måste kolla mer på detta sen.
 };
 
-//Minska kvantiteten av en produkt - exakt samma sak som innan. Typ copy/paste men minus istället.
 const decreaseQuantity = (productId) => {
   let cart = JSON.parse(localStorage.getItem("products")) || [];
   const index = cart.findIndex((product) => product.id == productId);
@@ -243,13 +182,11 @@ const decreaseQuantity = (productId) => {
       cart[index].quantity--;
       localStorage.setItem("products", JSON.stringify(cart));
       updateCartItemCount();
-      // Uppdatera gränssnittet för att visa den nya kvantiteten
       showCartProducts();
     }
   }
 };
 
-//Ta bort en produkt helt
 const removeProduct = (productId) => {
   let cart = JSON.parse(localStorage.getItem("products")) || [];
   cart = cart.filter((product) => product.id !== productId);
